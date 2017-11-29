@@ -327,7 +327,10 @@ public class DeviceManagementService extends Service {
                 "select we2.window as WINDOW insert into windowOutputStream; "+
 
                 "from edgeDeviceEventStream[(1 == ac and 0 == window and 0 == light) and 0 == keycard] " +
-                "select 'AC is on' as alertMessage insert into alertStream; ";
+                "select 'AC is on' as alertMessage insert into alertStream; "+
+
+                "from edgeDeviceEventStream[(0 == ac and 0 == window and 1 == light) and 0 == keycard] " +
+                "select 'Light is on' as alertMessage insert into alertStream; ";
 
 
 
