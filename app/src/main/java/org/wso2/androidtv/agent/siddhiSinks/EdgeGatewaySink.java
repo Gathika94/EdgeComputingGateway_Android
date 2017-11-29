@@ -145,11 +145,8 @@ public class EdgeGatewaySink extends Sink {
                 if (androidTVMQTTHandler.isConnected()) {
                     androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
                     Log.i("PublishStats", "Connection not available, hence entry is added to cache");
-                    //DeviceManagementService.persistData(wrapper.toString(),topic);
                 } else {
-
-                    /*cacheManagementService.addCacheEntry(topic, wrapper.toString());
-                    isCacheEnabled = true;*/
+                    //events should be persisted if persisting is enabled
                 }
             }else {
                 Log.i("TAG","androidtv mqtt handler not initialized");

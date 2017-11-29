@@ -68,39 +68,16 @@ public class SiddhiService extends Service {
         }
         siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(executionPlan);
         siddhiAppRuntime.start();
-      /*  siddhiAppRuntime.addCallback("alertQuery", new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                Log.d(TAG, "Event arrived on alertQuery");
-                if (mHandler != null) {
-                    for (Event e : inEvents) {
-                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY, e).sendToTarget();
-                    }
-                }
-            }
-        });*/
 
-
-        H2Connection h2Connection=new H2Connection(this);
+        //method to show alert messages
         siddhiAppRuntime.addCallback("alertStream", new StreamCallback() {
             @Override
             public void receive(Event[] events) {
                 System.out.println("alertEvent :"+events[0].getData(0));
                 String alertMsg = events[0].getData(0).toString();
                 showAlert(MessageActivity.class, alertMsg);
-                try {
-                    h2Connection.checkIfTableExists();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-
-
             }
         });
-
-        //Retrieving InputHandler to push events into Siddhi
-        //setInputHandler(siddhiAppRuntime.getInputHandler("edgeDeviceEventStream"));
         Log.i(TAG, "Starting execution plan.");
 
     }

@@ -96,8 +96,6 @@ public class DeviceManagementService extends Service {
     private static volatile String incomingMessage = "";
     private static volatile String sendingMessage = "";
     private static volatile boolean isCacheEnabled = false;
-    //private static volatile SourceEventListener sourceEventListener;
-   // private static ArrayList<Source> sources = new ArrayList<>();
     private static ArrayList<EdgeSourceSubscriber> sourceSubscribers = new ArrayList<>();
     private static ArrayList<PersistenceSubscriber> persistenceSubscribers = new ArrayList<>();
 
@@ -328,14 +326,8 @@ public class DeviceManagementService extends Service {
                 "from every we1=edgeDeviceEventStream, we2=edgeDeviceEventStream[we1.window != window ] " +
                 "select we2.window as WINDOW insert into windowOutputStream; "+
 
-                /*"from every aet1=edgeDeviceEventStream, aet2=edgeDeviceEventStream[aet1.ac != ac ] " +
-                "select aet2.ac as AC insert into actable; "+*/
-
-
                 "from edgeDeviceEventStream[(1 == ac and 0 == window and 0 == light) and 0 == keycard] " +
-                "select 'AC is on' as alertMessage insert into alertStream; "+
-
-                "from acOutputStream select AC  insert into gathikaAcTable2;";
+                "select 'AC is on' as alertMessage insert into alertStream; ";
 
 
 
@@ -734,7 +726,6 @@ public class DeviceManagementService extends Service {
 
     public static void connectToSource(EdgeSourceSubscriber sourceSubscriber) {
         sourceSubscribers.add(sourceSubscriber);
-        //sourceEventListener = srcEvntListner;
     }
 
     public static void disConnectToSource(EdgeSourceSubscriber sourceSubscriber) {
