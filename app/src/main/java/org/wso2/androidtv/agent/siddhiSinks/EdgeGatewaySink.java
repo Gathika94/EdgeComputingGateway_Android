@@ -39,12 +39,19 @@ import org.wso2.androidtv.agent.services.CacheManagementService;
         name = "edgeGateway",
         namespace = "sink",
         description = "This sink publishes data from edgeGateway to broker ",
-        parameters = { @Parameter(
+        parameters = {
+                @Parameter(
                 name = "topic",
                 description = "The topic to which the events processed by WSO2 SP are published via MQTT. " +
                         "This is a mandatory parameter.",
                 type = {DataType.STRING},
-                dynamic = true)},
+                dynamic = true),
+                @Parameter(
+                        name = "persist",
+                        description = "The variable to decide whether the data is going to be persisted" +
+                                "if the connection is unavailable.",
+                        type = {DataType.STRING},
+                        dynamic = true)},
         examples = @Example(description = "TBD", syntax = "TBD")
 )
 
@@ -53,6 +60,7 @@ public class EdgeGatewaySink extends Sink {
     private static AndroidTVMQTTHandler androidTVMQTTHandler;
 
     private Option topicOption;
+   // private Option persistOption;
 
     @Override
     public Class[] getSupportedInputEventClasses() {
@@ -61,13 +69,14 @@ public class EdgeGatewaySink extends Sink {
 
     @Override
     public String[] getSupportedDynamicOptions() {
-        return new String[]{MqttConstants.MESSAGE_TOPIC};
+        return new String[]{MqttConstants.MESSAGE_TOPIC,MqttConstants.PERSIST};
 
     }
 
     @Override
     protected void init(StreamDefinition streamDefinition, OptionHolder optionHolder, ConfigReader configReader, SiddhiAppContext siddhiAppContext) {
         this.topicOption = optionHolder.validateAndGetOption(MqttConstants.MESSAGE_TOPIC);
+        //this.persistOption=optionHolder.validateAndGetOption(MqttConstants.PERSIST);
     }
 
     @Override
@@ -135,8 +144,10 @@ public class EdgeGatewaySink extends Sink {
             if (androidTVMQTTHandler != null) {
                 if (androidTVMQTTHandler.isConnected()) {
                     androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
-                } else {
                     Log.i("PublishStats", "Connection not available, hence entry is added to cache");
+                    //DeviceManagementService.persistData(wrapper.toString(),topic);
+                } else {
+
                     /*cacheManagementService.addCacheEntry(topic, wrapper.toString());
                     isCacheEnabled = true;*/
                 }
