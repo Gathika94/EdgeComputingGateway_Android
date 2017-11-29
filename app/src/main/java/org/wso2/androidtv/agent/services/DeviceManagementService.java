@@ -300,36 +300,56 @@ public class DeviceManagementService extends Service {
         WeakReference<DeviceManagementService> mService;
 
         String executionPlan = "@app:name('edgeAnalytics') " +
-                "@source(type='textEdge', @map(type='text', fail.on.missing.attribute = 'true' , regex" +
-                ".T=\"\"\"\"t\":(\\w+)\"\"\", regex"+".H=\"\"\"\"h\":(\\w+)\"\"\", regex"+".A=\"\"\"\"a\":(\\w+)\"\"\", regex"+".W=\"\"\"\"w\":(\\w+)\"\"\", regex"+".K=\"\"\"\"k\":(\\w+)\"\"\", regex"+".L=\"\"\"\"l\":(\\w+)\"\"\", @attributes(temperature = 'T', humidity = 'H', ac = 'A', window = 'W', keycard = 'K', light = 'L')))"+
+                "@source(type='textEdge', @map(type='text', fail.on.missing.attribute = 'true' ," +
+                " regex" +
+                ".T=\"\"\"\"t\":(\\w+)\"\"\", regex"+".H=\"\"\"\"h\":(\\w+)\"\"\", " +
+                "regex"+".A=\"\"\"\"a\":(\\w+)\"\"\", regex"+".W=\"\"\"\"w\":(\\w+)\"\"\", " +
+                "regex"+".K=\"\"\"\"k\":(\\w+)\"\"\", regex"+".L=\"\"\"\"l\":(\\w+)\"\"\", " +
+                "@attributes(temperature = 'T', humidity = 'H', ac = 'A', window = 'W', " +
+                "keycard = 'K', light = 'L')))"+
                 "define stream edgeDeviceEventStream " +
-                "(ac Float, window float, light float, temperature float, humidity float, keycard float); " +
+                "(ac Float, window float, light float, temperature float, humidity float," +
+                " keycard float); " +
 
-                "@source(type='persist',@map(type='json')) define stream persistStream (topic String,wrapper String);"+
+                "@source(type='persist',@map(type='json')) " +
+                "define stream persistStream (topic String,wrapper String);"+
 
-                "@sink(type='edgeGateway',topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/AC',@map(type='json'))"+"define stream acOutputStream (AC Float);"+
-                "@sink(type='edgeGateway',topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/HUMIDITY',@map(type='json'))"+"define stream humidityOutputStream (HUMIDITY Float);"+
-                "@sink(type='edgeGateway',topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/TEMP',@map(type='json'))"+"define stream temperatureOutputStream (TEMP Float);"+
-                "@sink(type='edgeGateway',topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/WINDOW',@map(type='json'))"+"define stream windowOutputStream (WINDOW Float);"+
+                "@sink(type='edgeGateway'," +
+                "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/AC'," +
+                "@map(type='json'))"+"define stream acOutputStream (AC Float);"+
+                "@sink(type='edgeGateway'," +
+                "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/HUMIDITY'," +
+                "@map(type='json'))"+"define stream humidityOutputStream (HUMIDITY Float);"+
+                "@sink(type='edgeGateway'," +
+                "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/TEMP'," +
+                "@map(type='json'))"+"define stream temperatureOutputStream (TEMP Float);"+
+                "@sink(type='edgeGateway'," +
+                "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/WINDOW'," +
+                "@map(type='json'))"+"define stream windowOutputStream (WINDOW Float);"+
 
                 "@config(async = 'true') define stream alertStream (alertMessage String);"+
 
                 "from every ae1=edgeDeviceEventStream, ae2=edgeDeviceEventStream[ae1.ac != ac ] " +
                 "select ae2.ac as AC insert into acOutputStream; "+
 
-                "from every he1=edgeDeviceEventStream, he2=edgeDeviceEventStream[he1.humidity != humidity ] " +
+                "from every he1=edgeDeviceEventStream," +
+                " he2=edgeDeviceEventStream[he1.humidity != humidity ] " +
                 "select he2.humidity as HUMIDITY insert into humidityOutputStream; "+
 
-                "from every te1=edgeDeviceEventStream, te2=edgeDeviceEventStream[te1.temperature != temperature ] " +
+                "from every te1=edgeDeviceEventStream, " +
+                "te2=edgeDeviceEventStream[te1.temperature != temperature ] " +
                 "select te2.temperature as TEMP insert into temperatureOutputStream;"+
 
-                "from every we1=edgeDeviceEventStream, we2=edgeDeviceEventStream[we1.window != window ] " +
+                "from every we1=edgeDeviceEventStream, " +
+                "we2=edgeDeviceEventStream[we1.window != window ] " +
                 "select we2.window as WINDOW insert into windowOutputStream; "+
 
-                "from edgeDeviceEventStream[(1 == ac and 0 == window and 0 == light) and 0 == keycard] " +
+                "from edgeDeviceEventStream[(1 == ac and 0 == window and 0 == light) " +
+                "and 0 == keycard] " +
                 "select 'AC is on' as alertMessage insert into alertStream; "+
 
-                "from edgeDeviceEventStream[(0 == ac and 0 == window and 1 == light) and 0 == keycard] " +
+                "from edgeDeviceEventStream[(0 == ac and 0 == window and 1 == light) " +
+                "and 0 == keycard] " +
                 "select 'Light is on' as alertMessage insert into alertStream; ";
 
 
@@ -526,7 +546,8 @@ public class DeviceManagementService extends Service {
             if (androidTVMQTTHandler.isConnected()) {
                 androidTVMQTTHandler.publishDeviceData(wrapper.toString());
             } else {
-                Log.i("SendATResponse", "Connection not available, hence entry is added to cache");
+                Log.i("SendATResponse", "Connection not available, hence entry is " +
+                        "added to cache");
                 cacheManagementService.addCacheEntry(androidTVMQTTHandler.getDefaultPublishTopic(),
                         wrapper.toString());
                 isCacheEnabled = true;
@@ -536,7 +557,8 @@ public class DeviceManagementService extends Service {
         }
     }
 
-    private void publishStats(String topic,String streamNameKey, String streamNameValue, String key, float value) {
+    private void publishStats(String topic,String streamNameKey, String streamNameValue, String key,
+                              float value) {
         try {
             JSONObject jsonEvent = new JSONObject();
             JSONObject jsonMetaData = new JSONObject();
