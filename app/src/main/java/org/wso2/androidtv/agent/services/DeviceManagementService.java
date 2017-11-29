@@ -314,6 +314,12 @@ public class DeviceManagementService extends Service {
                 "@source(type='persist',@map(type='json')) " +
                 "define stream persistStream (topic String,wrapper String);"+
 
+                "@source(type='textEdge',@map(type='text', fail.on.missing.attribute= 'true'," +
+                "regex" +
+                ".L='(LON)'," +
+                "@attributes(lightOn = 'L')))" +
+                "define stream lightOnStream (lightOn String);"+
+
                 "@sink(type='edgeGateway'," +
                 "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/AC'," +
                 "@map(type='json'))"+"define stream acOutputStream (AC Float);"+
@@ -326,6 +332,9 @@ public class DeviceManagementService extends Service {
                 "@sink(type='edgeGateway'," +
                 "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/WINDOW'," +
                 "@map(type='json'))"+"define stream windowOutputStream (WINDOW Float);"+
+
+                "@sink(type='edgeResponse',topic='alert',@map(type='json'))" +
+                "define stream lightOnOutputStream (lightOnOutput String);"+
 
                 "@config(async = 'true') define stream alertStream (alertMessage String);"+
 
@@ -350,7 +359,10 @@ public class DeviceManagementService extends Service {
 
                 "from edgeDeviceEventStream[(0 == ac and 0 == window and 1 == light) " +
                 "and 0 == keycard] " +
-                "select 'Light is on' as alertMessage insert into alertStream; ";
+                "select 'Light is on' as alertMessage insert into alertStream; " +
+
+                "from lightOnStream select 'Light On' as lightOnOutput insert into " +
+                "lightOnOutputStream";
 
 
 
@@ -767,6 +779,10 @@ public class DeviceManagementService extends Service {
 
     public static AndroidTVMQTTHandler getAndroidTVMQTTHandler(){
         return androidTVMQTTHandler;
+    }
+
+    public static String getSerialOfCurrentEdgeDevice(){
+        return serialOfCurrentEdgeDevice;
     }
 
 

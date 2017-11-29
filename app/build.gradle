@@ -60,19 +60,19 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.0'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.0'
 
-    implementation('org.wso2.siddhi:siddhi-core:4.0.0-beta3-SNAPSHOT') {
+    implementation('org.wso2.siddhi:siddhi-core:4.0.0-beta3') {
         transitive = false;
     }
-    annotationProcessor('org.wso2.siddhi:siddhi-annotations:4.0.0-beta3-SNAPSHOT') {
+    annotationProcessor('org.wso2.siddhi:siddhi-annotations:4.0.0-beta3') {
         transitive = false
     }
-    implementation('org.wso2.siddhi:siddhi-annotations:4.0.0-beta3-SNAPSHOT') {
+    implementation('org.wso2.siddhi:siddhi-annotations:4.0.0-beta3') {
         transitive = false
     }
-    implementation('org.wso2.siddhi:siddhi-query-api:4.0.0-beta3-SNAPSHOT') {
+    implementation('org.wso2.siddhi:siddhi-query-api:4.0.0-beta3') {
         transitive = false
     }
-    implementation('org.wso2.siddhi:siddhi-query-compiler:4.0.0-beta3-SNAPSHOT') {
+    implementation('org.wso2.siddhi:siddhi-query-compiler:4.0.0-beta3') {
         transitive = false
     }
 
