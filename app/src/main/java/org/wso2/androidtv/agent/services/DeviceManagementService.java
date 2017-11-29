@@ -83,7 +83,7 @@ public class DeviceManagementService extends Service {
     private UsbService usbService;
     private SiddhiService siddhiService;
     private UsbServiceHandler usbServiceHandler;
-    private SiddhiServiceHandler siddhiServiceHandler;
+   // private SiddhiServiceHandler siddhiServiceHandler;
     private boolean hasPendingConfigDownload = false;
     private long downloadId = -1;
     private CacheManagementService cacheManagementService;
@@ -123,7 +123,7 @@ public class DeviceManagementService extends Service {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             siddhiService = ((SiddhiService.SiddhiBinder) iBinder).getService();
-            siddhiService.setHandler(siddhiServiceHandler);
+            //siddhiService.setHandler(siddhiServiceHandler);
         }
 
         @Override
@@ -294,7 +294,7 @@ public class DeviceManagementService extends Service {
         // Start UsbService(if it was not started before) and Bind it
         startService(UsbService.class, usbConnection, null);
 
-        siddhiServiceHandler = new SiddhiServiceHandler(this);
+       // siddhiServiceHandler = new SiddhiServiceHandler(this);
         Bundle extras = new Bundle();
 
         WeakReference<DeviceManagementService> mService;
@@ -645,7 +645,7 @@ public class DeviceManagementService extends Service {
     }
 
     // This handler will be passed to SiddhiService. Data received from SiddhiQuery is displayed through this handler
-    private static class SiddhiServiceHandler extends Handler {
+    /*private static class SiddhiServiceHandler extends Handler {
         private final WeakReference<DeviceManagementService> mService;
         private static String publishTopic;
 
@@ -653,9 +653,9 @@ public class DeviceManagementService extends Service {
             mService = new WeakReference<>(service);
             publishTopic = LocalRegistry.getTenantDomain(mService.get()) + "/" + TVConstants.DEVICE_TYPE + "/" +
                     LocalRegistry.getDeviceId(mService.get());
-        }
+        }*/
 
-        @Override
+       /* @Override
         public void handleMessage(Message msg) {
             Event data = (Event) msg.obj;
             Log.d(TAG, "Edge data received: " + data.toString());
@@ -665,8 +665,8 @@ public class DeviceManagementService extends Service {
                     mService.get().displayAlert((Float) data.getData(0) == 1, (Float) data.getData(1) == 1, (Float) data.getData(2) == 1);
                     break;
             }
-        }
-    }
+        }*/
+    //}
 
     private void runCacheManagementService() {
         cacheManagementService = new CacheManagementService(getApplicationContext());
