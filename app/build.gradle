@@ -28,19 +28,12 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
         merge 'META-INF/DEPENDENCIES'
-        // merge 'org/apache/log4j/lf5/config/defaultconfig.properties'
         merge 'META-INF/annotations/org.wso2.siddhi.annotation.Extension'
         merge'org/eclipse/paho/client/mqttv3/internal/nls/'
         merge 'org/eclipse/paho/client/mqttv3/logging/jsr47min.properties'
-
         merge 'javax/xml/bind/util/Messages.properties'
         merge 'javax/xml/bind/Messages.properties'
         merge 'javax/xml/bind/helpers/Messages.properties'
-       // merge 'META-INF/services/javax.xml.bind.JAXBContext'
-        /*merge 'org/eclipse/paho/client/mqttv3/internal/nls/messages_pl.properties'
-        merge 'org/eclipse/paho/client/mqttv3/internal/nls/messages_es.properties'
-        merge 'org/eclipse/paho/client/mqttv3/internal/nls/messages_ja.properties'
-        merge 'org/eclipse/paho/client/mqttv3/internal/nls/messages_cs.properties'*/
     }
 
 
