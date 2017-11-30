@@ -1,7 +1,9 @@
 package org.wso2.androidtv.agent.siddhiSources;
 
 /**
- * Created by gathikaratnayaka on 8/2/17.
+ * This is a customized Siddhi Source for Android Edge Computing Gateway.
+ * A customized Siddhi Source has been used in order to meet specific
+ * requirements of the Android Edge Computing Gateway.
  */
 
 import android.content.ComponentName;
@@ -36,7 +38,7 @@ import java.util.Map;
                       @Parameter(
                             name = "client.id",
                             description = "ID which should be given to the source. " +
-                            "This is a mandatory parameter.",
+                            "This can be the device ID.",
                             type = {DataType.STRING},
                             dynamic = false)
                       },
@@ -50,11 +52,19 @@ public class TextEdgeSource extends AbstractEdgeSource{
 
 
     @Override
-    public void init(SourceEventListener sourceEventListener, OptionHolder optionHolder, String[] strings, ConfigReader configReader, SiddhiAppContext siddhiAppContext) {
+    public void init(SourceEventListener sourceEventListener, OptionHolder optionHolder,
+                     String[] strings, ConfigReader configReader, SiddhiAppContext
+                                 siddhiAppContext) {
         super.init(sourceEventListener,optionHolder,strings,configReader,siddhiAppContext);
 
         this.clientId = optionHolder.validateAndGetStaticValue(TextEdgeConstants.CLIENT_ID,
                 TextEdgeConstants.EMPTY_STRING);
+
+        /*
+        sourceEventListner of the source will be passed to the source subscriber of the source.
+        When the subscriber receives data it will transmit the data to the source via the source
+         event listener.
+         */
         this.edgeSourceSubscriber = new EdgeSourceSubscriber(sourceEventListener,this.clientId);
 
     }
@@ -65,8 +75,12 @@ public class TextEdgeSource extends AbstractEdgeSource{
         return new Class[]{String.class};
     }
 
+
+    //The source will be connected to DeviceManagementService.
     @Override
-    public void connect(Source.ConnectionCallback connectionCallback) throws ConnectionUnavailableException {
+    public void connect(Source.ConnectionCallback connectionCallback) throws
+            ConnectionUnavailableException {
+
             DeviceManagementService.connectToSource(edgeSourceSubscriber);
 
     }

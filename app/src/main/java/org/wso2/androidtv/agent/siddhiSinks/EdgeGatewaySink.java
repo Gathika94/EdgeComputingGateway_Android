@@ -32,23 +32,32 @@ import org.wso2.androidtv.agent.services.DeviceManagementService;
 import org.wso2.androidtv.agent.services.CacheManagementService;
 
 /**
- * Created by gathikaratnayaka on 9/29/17.
+ * The EdgeGateway Sink is a customized Siddhi Sink.
+ * Each instance of this Siddhi Sink will use the default
+ * MQTT connection of the Android Edge Computing gateway.
+ * EdgeGateway can detect whether the MQTT connection between
+ * the Android Edge Computing Gateway and WSO2 IOT server exists.
+ * EdgeGateway sink will publish processed data to
+ * relevant topics in WSO2 IOT server and also can be used
+ * to persist data when the connection to the IOT server is broken.
  */
 
 @Extension(
         name = "edgeGateway",
         namespace = "sink",
-        description = "This sink publishes data from edgeGateway to broker ",
+        description = "This sink publishes data from edgeGateway to broker of IOT server ",
         parameters = {
                 @Parameter(
                 name = "topic",
-                description = "The topic to which the events processed by WSO2 SP are published via MQTT. " +
+                description = "The topic in the broker to which the events processed by " +
+                        "WSO2 SP are published via MQTT. " +
                         "This is a mandatory parameter.",
                 type = {DataType.STRING},
                 dynamic = true),
                 @Parameter(
                         name = "persist",
-                        description = "The variable to decide whether the data is going to be persisted" +
+                        description = "The variable to decide whether " +
+                                "the data is going to be persisted" +
                                 "if the connection is unavailable.",
                         type = {DataType.STRING},
                         dynamic = true)},
@@ -82,48 +91,44 @@ public class EdgeGatewaySink extends Sink {
     @Override
     public void publish(Object o, DynamicOptions dynamicOptions) throws ConnectionUnavailableException {
 
-        System.out.println("sinkOutput1 :" + o);
         try {
             JSONObject jObject = new JSONObject(o.toString());
             JSONObject event = jObject.getJSONObject("event");
-
-            System.out.println("sinkJsonlength:" + event.length());
-
-
-            JSONObject jsonEvent = new JSONObject();
-            JSONObject jsonMetaData = new JSONObject();
+            JSONObject jsonEvent = new JSONObject();    //event will contains metadata and payload
+            JSONObject jsonMetaData = new JSONObject(); //this will contain metadata info
 
             try {
                 jsonMetaData.put("owner", LocalRegistry.getOwnerNameSiddhi());
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeGatewaySink","Error while inserting values to JSON object");
             }
             try {
                 jsonMetaData.put("deviceId", LocalRegistry.getDeviceIDSiddhi());
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeGatewaySink","Error while inserting values to JSON object");
             }
 
             try {
                 jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeGatewaySink","Error while inserting values to JSON object");
             }
 
             try {
                 jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeGatewaySink","Error while inserting values to JSON object");
             }
             try {
                 jsonEvent.put("metaData", jsonMetaData);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeGatewaySink","Error while inserting values to JSON object");
             }
 
             JSONObject payload = new JSONObject();
+
+            //as the number of attributes in a payload can vary, a for loop is being used.
             for (int i = 0; i < event.names().length(); i++) {
-                System.out.println("sinkAA :" + "key = " + event.names().getString(i) + " value = " + event.get(event.names().getString(i)));
                 try {
                     payload.put(event.names().getString(i), event.get(event.names().getString(i)));
                 } catch (JSONException e) {
@@ -131,11 +136,10 @@ public class EdgeGatewaySink extends Sink {
                 }
             }
 
-            //payload.put(key, value);
             try {
                 jsonEvent.put("payloadData", payload);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeGatewaySink","Error while inserting values to JSON object");
             }
 
             JSONObject wrapper = new JSONObject();
@@ -149,14 +153,14 @@ public class EdgeGatewaySink extends Sink {
                     //events should be persisted if persisting is enabled
                 }
             }else {
-                Log.i("TAG","androidtv mqtt handler not initialized");
+                Log.i("EdgeGatewaySink","androidtv mqtt handler not initialized");
             }
 
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("EdgeGatewaySink","JSONException was thrown");
         } catch (TransportHandlerException e) {
-            e.printStackTrace();
+            Log.e("EdgeGatewaySink","JSONException was thrown");
         }
 
 
@@ -164,6 +168,7 @@ public class EdgeGatewaySink extends Sink {
 
     @Override
     public void connect() throws ConnectionUnavailableException {
+        //get the access to use the MQTT connection in the edge gateway.
         if(DeviceManagementService.getAndroidTVMQTTHandler()!=null){
             this.androidTVMQTTHandler = DeviceManagementService.getAndroidTVMQTTHandler();
         }else{

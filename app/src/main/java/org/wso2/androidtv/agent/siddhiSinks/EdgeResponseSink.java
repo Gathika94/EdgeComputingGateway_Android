@@ -27,7 +27,7 @@ import java.util.Calendar;
 import java.util.Map;
 
 /**
- * Created by gathikaratnayaka on 11/29/17.
+ * The purpose of EdgeResponse Sink is to .
  */
 
 @Extension(
@@ -38,7 +38,7 @@ import java.util.Map;
         parameters = {
                 @Parameter(
                         name = "topic",
-                        description = "The topic to which the events processed by WSO2 SP are published via MQTT. " +
+                        description = "The topic to which via MQTT. " +
                                 "This is a mandatory parameter.",
                         type = {DataType.STRING},
                         dynamic = true),
@@ -48,6 +48,7 @@ import java.util.Map;
 
 public class EdgeResponseSink extends Sink {
     private static AndroidTVMQTTHandler androidTVMQTTHandler;
+
 
     private Option topicOption;
 
@@ -68,55 +69,50 @@ public class EdgeResponseSink extends Sink {
 
     @Override
     public void publish(Object o, DynamicOptions dynamicOptions) throws ConnectionUnavailableException {
-        System.out.println("sinkOutput2 :" + o);
+
         try {
             JSONObject jObject = new JSONObject(o.toString());
             JSONObject event = jObject.getJSONObject("event");
-
-            System.out.println("sinkJsonlength:" + event.length());
-
-
             JSONObject jsonEvent = new JSONObject();
             JSONObject jsonMetaData = new JSONObject();
 
             try {
                 jsonMetaData.put("owner", LocalRegistry.getOwnerNameSiddhi());
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeResponseSink","Error while inserting values to JSON object");
             }
             try {
                 jsonMetaData.put("deviceId", LocalRegistry.getDeviceIDSiddhi());
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeResponseSink","Error while inserting values to JSON object");
             }
 
             try {
                 jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeResponseSink","Error while inserting values to JSON object");
             }
 
             try {
                 jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeResponseSink","Error while inserting values to JSON object");
             }
             try {
                 jsonEvent.put("metaData", jsonMetaData);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeResponseSink","Error while inserting values to JSON object");
             }
 
             JSONObject payload = new JSONObject();
             String message = event.get(event.names().getString(0)).toString();
             payload.put("serial", DeviceManagementService.getSerialOfCurrentEdgeDevice());
             payload.put("at_response", message);
-            System.out.println("sinkOutput3 :" + message);
-            //payload.put(key, value);
+
             try {
                 jsonEvent.put("payloadData", payload);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("EdgeResponseSink","Error while inserting values to JSON object");
             }
 
             JSONObject wrapper = new JSONObject();
@@ -127,17 +123,17 @@ public class EdgeResponseSink extends Sink {
                     androidTVMQTTHandler.publishDeviceData(wrapper.toString());
                 } else {
                     //events should be persisted if persisting is enabled
-                    //Log.i("PublishStats", "Connection not available, hence entry is added to cache");
+                    Log.i("PublishStats", "Connection not available");
                 }
             }else {
-                Log.i("TAG","androidtv mqtt handler not initialized");
+                Log.i("EdgeResponseSink","androidtv mqtt handler not initialized");
             }
 
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("EdgeResponseSink","JSONException was thrown");
         } catch (TransportHandlerException e) {
-            e.printStackTrace();
+            Log.e("EdgeResponseSink","TransportHandlerException was thrown");
         }
     }
 
@@ -146,7 +142,7 @@ public class EdgeResponseSink extends Sink {
         if(DeviceManagementService.getAndroidTVMQTTHandler()!=null){
             this.androidTVMQTTHandler = DeviceManagementService.getAndroidTVMQTTHandler();
         }else{
-            Log.i("TAG","androidTVMQTTHandler is not initialized");
+            Log.i("EdgeResponseSink","androidTVMQTTHandler is not initialized");
         }
 
     }

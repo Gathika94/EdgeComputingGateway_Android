@@ -28,7 +28,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -52,12 +51,8 @@ import org.wso2.androidtv.agent.mqtt.MessageReceivedCallback;
 import org.wso2.androidtv.agent.cache.CacheEntry;
 import org.wso2.androidtv.agent.mqtt.transport.TransportHandlerException;
 import org.wso2.androidtv.agent.subscribers.EdgeSourceSubscriber;
-import org.wso2.androidtv.agent.subscribers.PersistenceSubscriber;
 import org.wso2.androidtv.agent.util.AndroidTVUtils;
 import org.wso2.androidtv.agent.util.LocalRegistry;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.source.Source;
-import org.wso2.siddhi.core.stream.input.source.SourceEventListener;
 //import org.wso2.extension.siddhi.map.text.sourcemapper.TextSourceMapper;
 //import org.wso2.siddhi.extension.input.mapper.text.TextSourceMapper;
 import java.io.File;
@@ -69,7 +64,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -97,7 +91,7 @@ public class DeviceManagementService extends Service {
     private static volatile String sendingMessage = "";
     private static volatile boolean isCacheEnabled = false;
     private static ArrayList<EdgeSourceSubscriber> sourceSubscribers = new ArrayList<>();
-    private static ArrayList<PersistenceSubscriber> persistenceSubscribers = new ArrayList<>();
+
 
     private DownloadManager downloadManager;
 
@@ -268,10 +262,6 @@ public class DeviceManagementService extends Service {
 
     @Override
     public void onCreate() {
-
-
-
-
        androidTVMQTTHandler = new AndroidTVMQTTHandler(this, new MessageReceivedCallback() {
             @Override
             public void onMessageReceived(JSONObject message) throws JSONException {
@@ -310,10 +300,6 @@ public class DeviceManagementService extends Service {
                 "define stream edgeDeviceEventStream " +
                 "(ac Float, window float, light float, temperature float, humidity float," +
                 " keycard float); " +
-
-                "@source(type='persist',@map(type='json')) " +
-                "define stream persistStream (topic String,wrapper String);"+
-
                 "@source(type='textEdge',@map(type='text', fail.on.missing.attribute= 'true'," +
                 "regex" +
                 ".L='(LON)'," +
@@ -529,13 +515,6 @@ public class DeviceManagementService extends Service {
             }*/
         }
 
-    }
-
-    public static void persistData(String wrapper,String topic){
-        for(PersistenceSubscriber persistenceSubscriber:persistenceSubscribers){
-            System.out.println("persistence zzzzzz");
-            persistenceSubscriber.recieveEvent(wrapper,topic);
-        }
     }
 
     private void sendATResponse(String message) {
@@ -767,14 +746,6 @@ public class DeviceManagementService extends Service {
 
     public static void disConnectToSource(EdgeSourceSubscriber sourceSubscriber) {
         sourceSubscribers.remove(sourceSubscriber);
-    }
-
-    public static void connectToPersistenceSource(PersistenceSubscriber persistenceSubscriber){
-        persistenceSubscribers.add(persistenceSubscriber);
-    }
-
-    public static void disConnectToPersistenceSource(PersistenceSubscriber persistenceSubscriber){
-        persistenceSubscribers.remove(persistenceSubscriber);
     }
 
     public static AndroidTVMQTTHandler getAndroidTVMQTTHandler(){

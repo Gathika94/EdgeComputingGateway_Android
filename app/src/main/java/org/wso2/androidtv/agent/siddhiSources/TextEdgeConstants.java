@@ -1,7 +1,7 @@
 package org.wso2.androidtv.agent.siddhiSources;
 
 /**
- * Created by gathikaratnayaka on 10/17/17.
+ * This class is to facilitate parameter management of the TextEdge Siddhi Source.
  */
 
 public class TextEdgeConstants {

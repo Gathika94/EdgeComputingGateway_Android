@@ -28,7 +28,6 @@ public class H2Connection implements CacheManager{
 
 
     public void initializeConnection() throws SQLException, ClassNotFoundException {
-
         File directory = contextWrapper.getFilesDir();
         System.out.println("h2 db direcotry :"+directory);
         String url = "jdbc:h2:/data/data/" +
@@ -40,10 +39,6 @@ public class H2Connection implements CacheManager{
         Class.forName("org.h2.Driver");
         conn = DriverManager.getConnection(url,"admin","admin");
         Statement stat = conn.createStatement();
-    }
-
-    public void checkIfTableExists() throws SQLException {
-
     }
 
     @Override

@@ -1,7 +1,8 @@
 package org.wso2.androidtv.agent.siddhiSinks;
 
 /**
- * Created by gathikaratnayaka on 9/29/17.
+ * This class is to facilitate parameter management of the customized Siddhi Sinks
+ * inside Android Edge Computing Gateway.
  */
 
 public class MqttConstants {

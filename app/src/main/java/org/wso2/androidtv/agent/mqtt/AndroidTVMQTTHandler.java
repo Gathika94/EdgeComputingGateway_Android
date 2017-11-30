@@ -52,6 +52,7 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
 
     private MessageReceivedCallback messageReceivedCallback;
     private String publishTopic;
+    private String topicPrefix;
     private Context context;
 
     /**
@@ -63,6 +64,8 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         this.messageReceivedCallback = messageReceivedCallback;
         this.publishTopic = LocalRegistry.getTenantDomain(context)+ "/" + TVConstants.DEVICE_TYPE + "/" +
                 LocalRegistry.getDeviceId(context) + "/at_response";
+        this.topicPrefix =  LocalRegistry.getTenantDomain(context)+ "/" + TVConstants.DEVICE_TYPE + "/" +
+                LocalRegistry.getDeviceId(context);
     }
 
     /**
@@ -217,7 +220,12 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
     }
 
     public String getDefaultPublishTopic() {
+
         return publishTopic;
+    }
+
+    public String getTopicPrefix(){
+        return topicPrefix;
     }
 
 }
