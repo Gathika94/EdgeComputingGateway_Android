@@ -58,8 +58,11 @@ import org.wso2.androidtv.agent.services.CacheManagementService;
                         name = "persist",
                         description = "The variable to decide whether " +
                                 "the data is going to be persisted" +
-                                "if the connection is unavailable.",
-                        type = {DataType.STRING},
+                                "if the connection is unavailable." +
+                                "Default value is false" ,
+                        type = {DataType.BOOL},
+                        optional = true,
+                        defaultValue = "false",
                         dynamic = true)},
         examples = @Example(description = "TBD", syntax = "TBD")
 )
@@ -69,7 +72,7 @@ public class EdgeGatewaySink extends Sink {
     private static AndroidTVMQTTHandler androidTVMQTTHandler;
 
     private Option topicOption;
-   // private Option persistOption;
+    private boolean persistOption;
 
     @Override
     public Class[] getSupportedInputEventClasses() {
@@ -85,13 +88,15 @@ public class EdgeGatewaySink extends Sink {
     @Override
     protected void init(StreamDefinition streamDefinition, OptionHolder optionHolder, ConfigReader configReader, SiddhiAppContext siddhiAppContext) {
         this.topicOption = optionHolder.validateAndGetOption(MqttConstants.MESSAGE_TOPIC);
-        //this.persistOption=optionHolder.validateAndGetOption(MqttConstants.PERSIST);
+        this.persistOption=Boolean.parseBoolean(optionHolder.validateAndGetStaticValue(MqttConstants.PERSIST,MqttConstants.DEFAULT_PERSIST));
     }
 
     @Override
     public void publish(Object o, DynamicOptions dynamicOptions) throws ConnectionUnavailableException {
 
         try {
+            String topic = topicOption.getValue(dynamicOptions);
+
             JSONObject jObject = new JSONObject(o.toString());
             JSONObject event = jObject.getJSONObject("event");
             JSONObject jsonEvent = new JSONObject();    //event will contains metadata and payload
@@ -144,13 +149,15 @@ public class EdgeGatewaySink extends Sink {
 
             JSONObject wrapper = new JSONObject();
             wrapper.put("event", jsonEvent);
-            String topic = topicOption.getValue(dynamicOptions);
+
             if (androidTVMQTTHandler != null) {
                 if (androidTVMQTTHandler.isConnected()) {
                     androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
                     Log.i("PublishStats", "Connection not available, hence entry is added to cache");
                 } else {
-                    //events should be persisted if persisting is enabled
+                    if(persistOption) {
+                        //events should be persisted if persisting is enabled
+                    }
                 }
             }else {
                 Log.i("EdgeGatewaySink","androidtv mqtt handler not initialized");
