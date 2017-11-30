@@ -60,7 +60,6 @@ import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
@@ -279,11 +278,7 @@ public class DeviceManagementService extends Service {
         usbServiceHandler = new UsbServiceHandler(this);
         /*Start UsbService(if it was not started before) and Bind it*/
         startService(UsbService.class, usbConnection, null);
-
-
         Bundle extras = new Bundle();
-
-        WeakReference<DeviceManagementService> mService;
 
         String executionPlan = "@app:name('edgeAnalytics') " +
                 "@source(type='textEdge', @map(type='text', fail.on.missing.attribute = 'true' ," +
@@ -476,7 +471,9 @@ public class DeviceManagementService extends Service {
             waitFlag = false;
         } else {
             Log.i(TAG, "Message> " + message);
-            System.out.println("Message :"+ message);
+
+            /*the recieving message is published into the Siddhi Sources
+            * via the source subscribers*/
             for (EdgeSourceSubscriber sourceSubscriber : sourceSubscribers) {
                 sourceSubscriber.recieveEvent(message, null);
             }

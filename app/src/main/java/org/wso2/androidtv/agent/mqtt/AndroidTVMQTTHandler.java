@@ -136,7 +136,8 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
             }
         } else {
             String errorMsg =
-                    "MQTT message [" + mqttMessage.toString() + "] was received without the topic information.";
+                    "MQTT message [" + mqttMessage.toString() + "] was received without the" +
+                            " topic information.";
             Log.w(TAG, errorMsg);
         }
     }
@@ -172,14 +173,16 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
                     try {
                         closeConnection();
                     } catch (MqttException e) {
-                        Log.w(TAG, "Unable to 'STOP' MQTT connection at broker at: " + mqttBrokerEndPoint
+                        Log.w(TAG, "Unable to 'STOP' MQTT connection at broker at: "
+                                + mqttBrokerEndPoint
                                 + " for device-type - " + TVConstants.DEVICE_TYPE, e);
 
                         try {
                             Thread.sleep(timeoutInterval);
                         } catch (InterruptedException e1) {
                             Thread.currentThread().interrupt();
-                            Log.e(TAG, "MQTT-Terminator: Thread Sleep Interrupt Exception at device-type - " +
+                            Log.e(TAG, "MQTT-Terminator: Thread Sleep Interrupt Exception " +
+                                    "at device-type - " +
                                     TVConstants.DEVICE_TYPE, e1);
                         }
                     }
