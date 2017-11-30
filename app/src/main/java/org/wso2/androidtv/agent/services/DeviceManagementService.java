@@ -306,6 +306,12 @@ public class DeviceManagementService extends Service {
                 "@attributes(lightOn = 'L')))" +
                 "define stream lightOnStream (lightOn String);"+
 
+                "@source(type='textEdge',@map(type='text', fail.on.missing.attribute= 'true'," +
+                "regex" +
+                ".L='(LOFF)'," +
+                "@attributes(lightOff = 'L')))" +
+                "define stream lightOffStream (lightOff String);"+
+
                 "@sink(type='edgeGateway'," +
                 "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/AC'," +
                 "@map(type='json'))"+"define stream acOutputStream (AC Float);"+
@@ -321,6 +327,9 @@ public class DeviceManagementService extends Service {
 
                 "@sink(type='edgeResponse',topic='alert',@map(type='json'))" +
                 "define stream lightOnOutputStream (lightOnOutput String);"+
+
+                "@sink(type='edgeResponse',topic='alert',@map(type='json'))" +
+                "define stream lightOffOutputStream (lightOffOutput String);"+
 
                 "@config(async = 'true') define stream alertStream (alertMessage String);"+
 
@@ -348,7 +357,10 @@ public class DeviceManagementService extends Service {
                 "select 'Light is on' as alertMessage insert into alertStream; " +
 
                 "from lightOnStream select 'Light On' as lightOnOutput insert into " +
-                "lightOnOutputStream";
+                "lightOnOutputStream;"+
+
+                "from lightOffStream select 'Light Off' as lightOffOutput insert into " +
+                "lightOffOutputStream;";
 
 
 
