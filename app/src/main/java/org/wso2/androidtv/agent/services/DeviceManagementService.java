@@ -325,10 +325,10 @@ public class DeviceManagementService extends Service {
                 "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/WINDOW'," +
                 "@map(type='json'))"+"define stream windowOutputStream (WINDOW Float);"+
 
-                "@sink(type='edgeResponse',topic='alert',@map(type='json'))" +
+                "@sink(type='edgeResponse',topic='at_response',@map(type='json'))" +
                 "define stream lightOnOutputStream (lightOnOutput String);"+
 
-                "@sink(type='edgeResponse',topic='alert',@map(type='json'))" +
+                "@sink(type='edgeResponse',topic='at_response',@map(type='json'))" +
                 "define stream lightOffOutputStream (lightOffOutput String);"+
 
                 "@config(async = 'true') define stream alertStream (alertMessage String);"+

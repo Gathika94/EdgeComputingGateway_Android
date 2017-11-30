@@ -65,7 +65,7 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         this.publishTopic = LocalRegistry.getTenantDomain(context)+ "/" + TVConstants.DEVICE_TYPE + "/" +
                 LocalRegistry.getDeviceId(context) + "/at_response";
         this.topicPrefix =  LocalRegistry.getTenantDomain(context)+ "/" + TVConstants.DEVICE_TYPE + "/" +
-                LocalRegistry.getDeviceId(context);
+                LocalRegistry.getDeviceId(context)+"/";
     }
 
     /**

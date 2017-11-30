@@ -51,6 +51,9 @@ public class EdgeResponseSink extends Sink {
 
 
     private Option topicOption;
+    private String deviceTopic;
+    private String specificTopic;
+    private String topic;
 
     @Override
     public Class[] getSupportedInputEventClasses() {
@@ -70,6 +73,8 @@ public class EdgeResponseSink extends Sink {
     @Override
     public void publish(Object o, DynamicOptions dynamicOptions) throws ConnectionUnavailableException {
 
+        specificTopic = topicOption.getValue(dynamicOptions);
+        topic = this.deviceTopic+this.specificTopic;
         try {
             JSONObject jObject = new JSONObject(o.toString());
             JSONObject event = jObject.getJSONObject("event");
@@ -117,10 +122,10 @@ public class EdgeResponseSink extends Sink {
 
             JSONObject wrapper = new JSONObject();
             wrapper.put("event", jsonEvent);
-           // String topic = topicOption.getValue(dynamicOptions);
+
             if (androidTVMQTTHandler != null) {
                 if (androidTVMQTTHandler.isConnected()) {
-                    androidTVMQTTHandler.publishDeviceData(wrapper.toString());
+                    androidTVMQTTHandler.publishDeviceData(wrapper.toString(),topic);
                 } else {
                     //events should be persisted if persisting is enabled
                     Log.i("PublishStats", "Connection not available");
@@ -141,6 +146,7 @@ public class EdgeResponseSink extends Sink {
     public void connect() throws ConnectionUnavailableException {
         if(DeviceManagementService.getAndroidTVMQTTHandler()!=null){
             this.androidTVMQTTHandler = DeviceManagementService.getAndroidTVMQTTHandler();
+            this.deviceTopic=androidTVMQTTHandler.getTopicPrefix();
         }else{
             Log.i("EdgeResponseSink","androidTVMQTTHandler is not initialized");
         }
