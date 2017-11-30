@@ -53,8 +53,6 @@ import org.wso2.androidtv.agent.mqtt.transport.TransportHandlerException;
 import org.wso2.androidtv.agent.subscribers.EdgeSourceSubscriber;
 import org.wso2.androidtv.agent.util.AndroidTVUtils;
 import org.wso2.androidtv.agent.util.LocalRegistry;
-//import org.wso2.extension.siddhi.map.text.sourcemapper.TextSourceMapper;
-//import org.wso2.siddhi.extension.input.mapper.text.TextSourceMapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -77,7 +75,6 @@ public class DeviceManagementService extends Service {
     private UsbService usbService;
     private SiddhiService siddhiService;
     private UsbServiceHandler usbServiceHandler;
-   // private SiddhiServiceHandler siddhiServiceHandler;
     private boolean hasPendingConfigDownload = false;
     private long downloadId = -1;
     private CacheManagementService cacheManagementService;
@@ -117,7 +114,6 @@ public class DeviceManagementService extends Service {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             siddhiService = ((SiddhiService.SiddhiBinder) iBinder).getService();
-            //siddhiService.setHandler(siddhiServiceHandler);
         }
 
         @Override
@@ -281,10 +277,10 @@ public class DeviceManagementService extends Service {
 
 
         usbServiceHandler = new UsbServiceHandler(this);
-        // Start UsbService(if it was not started before) and Bind it
+        /*Start UsbService(if it was not started before) and Bind it*/
         startService(UsbService.class, usbConnection, null);
 
-       // siddhiServiceHandler = new SiddhiServiceHandler(this);
+
         Bundle extras = new Bundle();
 
         WeakReference<DeviceManagementService> mService;
@@ -368,7 +364,6 @@ public class DeviceManagementService extends Service {
         startService(SiddhiService.class, siddhiConnection, extras);
 
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        //runCacheManagementService();
     }
 
     @Override
@@ -481,137 +476,12 @@ public class DeviceManagementService extends Service {
             waitFlag = false;
         } else {
             Log.i(TAG, "Message> " + message);
-           /* try {
-                JSONObject incomingMsg = new JSONObject(message);*/
-               /* switch (incomingMsg.getString("a")) {
-                    case "LON":
-                        sendATResponse("Light ON");
-                        break;
-                    case "LOFF":
-                        sendATResponse("Light OFF");
-                        break;
-                    case "DOPEN":
-                        sendATResponse("Door lock opened");
-                        break;
-                    case "DCLOSE":
-                        sendATResponse("Door lock closed");
-                        break;
-                    case "CIN":
-                        sendATResponse("Access card inserted");
-                        break;
-                    case "CO":
-                        sendATResponse("Access card removed");
-                        break;
-                    case "DATA":*/
-
-                        /*JSONObject payload = incomingMsg.getJSONObject("p");
-                        float temp = payload.getInt("t");
-                        float humidity = payload.getInt("h");
-                        int ac = payload.getInt("a");
-                        int window = payload.getInt("w");
-                        int light = payload.getInt("l");
-                        int keyCard = payload.getInt("k");*/
-            //siddhiService.getInputHandler().send(new Object[]{ac, window, light, temp, humidity, keyCard});
             System.out.println("Message :"+ message);
             for (EdgeSourceSubscriber sourceSubscriber : sourceSubscribers) {
-                //sourceEventListener.onEvent(message, null);
                 sourceSubscriber.recieveEvent(message, null);
             }
-            // }
-            //break;
-            //   }
-            /*} catch (JSONException e) {
-                Log.e(TAG, "Incomplete incoming message. Ignored", e);
-            }*//*catch (InterruptedException e) {
-                Log.e(TAG, e.getClass().getSimpleName(), e);
-            }*/
         }
 
-    }
-
-    private void sendATResponse(String message) {
-        try {
-            JSONObject jsonEvent = new JSONObject();
-            JSONObject jsonMetaData = new JSONObject();
-            jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
-            jsonMetaData.put("deviceId", getDeviceId());
-            jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
-            jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
-            jsonEvent.put("metaData", jsonMetaData);
-
-            JSONObject payload = new JSONObject();
-            payload.put("serial", serialOfCurrentEdgeDevice);
-            payload.put("at_response", message);
-            jsonEvent.put("payloadData", payload);
-
-            JSONObject wrapper = new JSONObject();
-            wrapper.put("event", jsonEvent);
-            if (androidTVMQTTHandler.isConnected()) {
-                androidTVMQTTHandler.publishDeviceData(wrapper.toString());
-            } else {
-                Log.i("SendATResponse", "Connection not available, hence entry is " +
-                        "added to cache");
-                cacheManagementService.addCacheEntry(androidTVMQTTHandler.getDefaultPublishTopic(),
-                        wrapper.toString());
-                isCacheEnabled = true;
-            }
-        } catch (TransportHandlerException | JSONException e) {
-            Log.e(TAG, e.getClass().getSimpleName(), e);
-        }
-    }
-
-    private void publishStats(String topic,String streamNameKey, String streamNameValue, String key,
-                              float value) {
-        try {
-            JSONObject jsonEvent = new JSONObject();
-            JSONObject jsonMetaData = new JSONObject();
-            jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
-            jsonMetaData.put("deviceId", getDeviceId());
-            jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
-            jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
-            jsonEvent.put("metaData", jsonMetaData);
-
-            JSONObject payload = new JSONObject();
-            payload.put(streamNameKey,streamNameValue);
-            payload.put(key, value);
-            jsonEvent.put("payloadData", payload);
-
-            JSONObject wrapper = new JSONObject();
-            wrapper.put("event", jsonEvent);
-            if (androidTVMQTTHandler.isConnected()) {
-                androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
-            } else {
-                Log.i("PublishStats", "Connection not available, hence entry is added to cache");
-                cacheManagementService.addCacheEntry(topic, wrapper.toString());
-                isCacheEnabled = true;
-            }
-        } catch (TransportHandlerException | JSONException e) {
-            Log.e(TAG, e.getClass().getSimpleName(), e);
-        }
-    }
-
-    public void displayAlert(boolean ac, boolean window, boolean light) {
-        String alertMsg = "Please ";
-        if (window) {
-            alertMsg += "close the window ";
-        }
-        if (ac || light) {
-            if (window) {
-                alertMsg += "and ";
-            }
-            alertMsg += "turn off ";
-            if (ac) {
-                alertMsg += "AC ";
-            }
-            if (ac && light) {
-                alertMsg += "and ";
-            }
-            if (light) {
-                alertMsg += "Light ";
-            }
-        }
-        alertMsg += "before leaving the room.";
-        startActivity(MessageActivity.class, alertMsg);
     }
 
     private String getDeviceId() {
@@ -669,29 +539,6 @@ public class DeviceManagementService extends Service {
         }
     }
 
-    // This handler will be passed to SiddhiService. Data received from SiddhiQuery is displayed through this handler
-    /*private static class SiddhiServiceHandler extends Handler {
-        private final WeakReference<DeviceManagementService> mService;
-        private static String publishTopic;
-
-        SiddhiServiceHandler(DeviceManagementService service) {
-            mService = new WeakReference<>(service);
-            publishTopic = LocalRegistry.getTenantDomain(mService.get()) + "/" + TVConstants.DEVICE_TYPE + "/" +
-                    LocalRegistry.getDeviceId(mService.get());
-        }*/
-
-       /* @Override
-        public void handleMessage(Message msg) {
-            Event data = (Event) msg.obj;
-            Log.d(TAG, "Edge data received: " + data.toString());
-            switch (msg.what) {
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY:
-                    //mService.get().publishStats(publishTopic + "/ALERT", "operation", new Float ("1"));
-                    mService.get().displayAlert((Float) data.getData(0) == 1, (Float) data.getData(1) == 1, (Float) data.getData(2) == 1);
-                    break;
-            }
-        }*/
-    //}
 
     private void runCacheManagementService() {
         cacheManagementService = new CacheManagementService(getApplicationContext());

@@ -156,8 +156,6 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         }
         if (publishData.length == 2) {
             publishToQueue(publishData[1], publishData[0]);
-        } else {
-            publishToQueue(publishTopic, publishData[0]);
         }
     }
 
