@@ -313,16 +313,16 @@ public class DeviceManagementService extends Service {
                 "define stream lightOffStream (lightOff String);"+
 
                 "@sink(type='edgeGateway'," +
-                "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/AC'," +
+                "topic='AC'," +
                 "@map(type='json'))"+"define stream acOutputStream (AC Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/HUMIDITY'," +
+                "topic='HUMIDITY'," +
                 "@map(type='json'))"+"define stream humidityOutputStream (HUMIDITY Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/TEMP'," +
+                "topic='TEMP'," +
                 "@map(type='json'))"+"define stream temperatureOutputStream (TEMP Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='carbon.super/androidtv/00000000-1209-8a12-0033-c5870033c587/WINDOW'," +
+                "topic='WINDOW'," +
                 "@map(type='json'))"+"define stream windowOutputStream (WINDOW Float);"+
 
                 "@sink(type='edgeResponse',topic='at_response',@map(type='json'))" +

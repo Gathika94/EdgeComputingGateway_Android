@@ -73,6 +73,9 @@ public class EdgeGatewaySink extends Sink {
 
     private Option topicOption;
     private boolean persistOption;
+    private String deviceTopic;
+    private String specificTopic;
+    private String topic;
 
     @Override
     public Class[] getSupportedInputEventClasses() {
@@ -95,7 +98,8 @@ public class EdgeGatewaySink extends Sink {
     public void publish(Object o, DynamicOptions dynamicOptions) throws ConnectionUnavailableException {
 
         try {
-            String topic = topicOption.getValue(dynamicOptions);
+            specificTopic = topicOption.getValue(dynamicOptions);
+            topic=this.deviceTopic+this.specificTopic;
 
             JSONObject jObject = new JSONObject(o.toString());
             JSONObject event = jObject.getJSONObject("event");
@@ -153,7 +157,8 @@ public class EdgeGatewaySink extends Sink {
             if (androidTVMQTTHandler != null) {
                 if (androidTVMQTTHandler.isConnected()) {
                     androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
-                    Log.i("PublishStats", "Connection not available, hence entry is added to cache");
+                    this.deviceTopic=androidTVMQTTHandler.getTopicPrefix();
+                    Log.i("PublishStats", "Connection is available, published stats");
                 } else {
                     if(persistOption) {
                         //events should be persisted if persisting is enabled
